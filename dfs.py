@@ -80,16 +80,23 @@ def getGraphFromArray(array):
 
     return graph
 
-def generatePathes(array):
+def generatePathes(array, target):
     graphDict = getGraphFromArray(array)
     vertexes = set(graphDict.keys())
-    patches = []
     for firstV in vertexes:
         for endV in vertexes - set([firstV]):
-            patches.extend(list(dfs_paths_2(graphDict, firstV, endV)))
+            for path in dfs_paths_1(graphDict, firstV, endV):
+                target.send(path)
 
-    return patches
     
 
+def fileCoroutine(filename):
+    with open(filename, 'w') as fin:
+        while True:
+            line = yield
+            fin.write(str(line) + '\n')
 
-
+def main():
+    cosnumer = fileCoroutine('pathes.txt')
+    cosnumer.send(None)
+    generatePathes(real_array, cosnumer)
